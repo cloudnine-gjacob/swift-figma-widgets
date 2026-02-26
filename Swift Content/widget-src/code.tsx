@@ -35,10 +35,21 @@ function Widget() {
   const [widgetWidth, setWidgetWidth] = useSyncedState('widgetWidth', 800)
   const [editingEnabled, setEditingEnabled] = useSyncedState('editingEnabled', false)
   const [isTranslating, setIsTranslating] = useSyncedState('isTranslating', false)
+  const [status, setStatus] = useSyncedState('status', 'pending')
   const widgetNodeId = useWidgetNodeId()
 
   usePropertyMenu(
     [
+      {
+        itemType: 'dropdown',
+        propertyName: 'status',
+        tooltip: 'Status',
+        selectedOption: status,
+        options: [
+          { option: 'pending', label: 'Pending' },
+          { option: 'approved', label: 'Approved' },
+        ],
+      },
       {
         itemType: 'dropdown',
         propertyName: 'locale',
@@ -82,6 +93,10 @@ function Widget() {
       },
     ],
     ({ propertyName, propertyValue }) => {
+      if (propertyName === 'status' && propertyValue) {
+        setStatus(propertyValue)
+        return
+      }
       if (propertyName === 'locale' && propertyValue) {
         setLocale(propertyValue)
         return
@@ -230,8 +245,6 @@ function Widget() {
 
   const translateContent = () => {
     return waitForTask((async () => {
-      setIsTranslating(true)
-      
       try {
         // Get API key and model from client storage (shared with plugin)
         let apiKey = await figma.clientStorage.getAsync('ai_claude_api_key')
@@ -317,6 +330,8 @@ function Widget() {
           // Store API key in client storage for future use
           await figma.clientStorage.setAsync('ai_claude_api_key', apiKey)
         }
+        
+        setIsTranslating(true)
         
         // Translate each content item
         const translatedItems = []
@@ -406,22 +421,8 @@ function Widget() {
         spacing={10}
         cornerRadius={{ topLeft: 8, topRight: 8, bottomLeft: 0, bottomRight: 0 }}
       >
-        {/* Top row: locale badge + translate button + sujet (right-aligned) */}
+        {/* Top row: translate button + status badge + locale (centered) + sujet (right-aligned) */}
         <AutoLayout spacing={8} verticalAlignItems="center" width="fill-parent">
-          <AutoLayout
-            fill={C.warning}
-            cornerRadius={6}
-            padding={{ vertical: 6, horizontal: 12 }}
-          >
-            <Text
-              fill={C.textPrimary}
-              fontSize={32}
-              fontWeight={700}
-              fontFamily="Inter"
-            >
-              {locale}
-            </Text>
-          </AutoLayout>
           <AutoLayout
             fill={C.primary}
             cornerRadius={6}
@@ -436,6 +437,22 @@ function Widget() {
               fontFamily="Inter"
             >
               {isTranslating ? 'Translating...' : 'Translate'}
+            </Text>
+          </AutoLayout>
+          <AutoLayout
+            fill={status === 'approved' ? C.success : '#E53935'}
+            cornerRadius={6}
+            padding={{ vertical: 10, horizontal: 12 }}
+            hoverStyle={{ fill: status === 'approved' ? '#45A049' : '#C62828' }}
+            onClick={() => setStatus(status === 'approved' ? 'pending' : 'approved')}
+          >
+            <Text
+              fill={C.textPrimary}
+              fontSize={27}
+              fontWeight={700}
+              fontFamily="Inter"
+            >
+              {status === 'approved' ? 'Approved' : 'Pending'}
             </Text>
           </AutoLayout>
           <AutoLayout
@@ -469,6 +486,20 @@ function Widget() {
                 {sujet || 'Sujet'}
               </Text>
             )}
+          </AutoLayout>
+          <AutoLayout
+            fill={C.warning}
+            cornerRadius={6}
+            padding={{ vertical: 6, horizontal: 12 }}
+          >
+            <Text
+              fill={C.textPrimary}
+              fontSize={32}
+              fontWeight={700}
+              fontFamily="Inter"
+            >
+              {locale}
+            </Text>
           </AutoLayout>
         </AutoLayout>
       </AutoLayout>
