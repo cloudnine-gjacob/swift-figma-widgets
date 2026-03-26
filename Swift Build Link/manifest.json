@@ -1,6 +1,6 @@
 {
-  "name": "Swift Content",
-  "id": "1608557402861625773",
+  "name": "Swift Build Link",
+  "id": "1608785555089641616",
   "api": "1.0.0",
   "main": "dist/code.js",
   "capabilities": [],
@@ -12,8 +12,10 @@
   ],
   "containsWidget": true,
   "widgetApi": "1.0.0",
+  "ui": "ui.html",
   "networkAccess": {
     "allowedDomains": [
+      "https://grist.cloudnine.de/"
     ]
   }
 }

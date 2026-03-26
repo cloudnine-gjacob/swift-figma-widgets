@@ -1,6 +1,6 @@
 {
-  "name": "Swift Content",
-  "id": "1608557402861625773",
+  "name": "Swift Feedback",
+  "id": "1608810087307567397",
   "api": "1.0.0",
   "main": "dist/code.js",
   "capabilities": [],
@@ -12,8 +12,12 @@
   ],
   "containsWidget": true,
   "widgetApi": "1.0.0",
+  "permissions": [
+    "currentuser"
+  ],
   "networkAccess": {
     "allowedDomains": [
+      "none"
     ]
   }
 }
